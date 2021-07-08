@@ -148,10 +148,10 @@ public class PlayerController : MonoBehaviour {
         DisplayHealth();
         SelectGuns();   
 
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            Time.timeScale = 0; 
-            SceneManager.LoadScene("Menu");
-        }
+        // if (Input.GetKeyDown(KeyCode.Escape)) {
+        //     Time.timeScale = 0; 
+        //     SceneManager.LoadScene("Menu");
+        // }
 
         if (isPlayerDead) {
             return;

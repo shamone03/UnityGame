@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 
 public class NavMeshAgentBrain : MonoBehaviour {
@@ -15,6 +17,9 @@ public class NavMeshAgentBrain : MonoBehaviour {
     public GameObject grenadeDrop;
     public Animator animator;
     NavMeshAgent navMeshAgent;
+
+    
+
     // Start is called before the first frame update
     void Start() { 
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -52,28 +57,30 @@ public class NavMeshAgentBrain : MonoBehaviour {
         //}
 
         counter += Time.deltaTime;
-        
 
-        if (Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 30, playerMask) && !Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 3, playerMask)) {
+        if (navMeshAgent.isOnNavMesh) {
             
-            shouldMove = true;
-            animator.Play("Z_Run_InPlace");
-        } else if (Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 3, playerMask)) {
-            shouldMove = false;
-            animator.Play("Z_Attack");
-            if (counter >= timeBetweenHits) {
-                player.transform.GetComponent<PlayerController>().Damage(5);
-                counter = 0;
+            if (Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 30, playerMask) && !Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 3, playerMask)) {
+                
+                shouldMove = true;
+                animator.Play("Z_Run_InPlace");
+            } else if (Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 3, playerMask)) {
+                shouldMove = false;
+                animator.Play("Z_Attack");
+                if (counter >= timeBetweenHits) {
+                    player.transform.GetComponent<PlayerController>().Damage(3);
+                    counter = 0;
+                }
+            } else {
+                shouldMove = false;
+                navMeshAgent.isStopped = true;
+                animator.Play("Z_Idle");
             }
-        } else {
-            shouldMove = false;
-            navMeshAgent.isStopped = true;
-            animator.Play("Z_Idle");
-        }
 
-        if (shouldMove) {
-            navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(player.transform.position);
+            if (shouldMove) {
+                navMeshAgent.isStopped = false;
+                navMeshAgent.SetDestination(player.transform.position);
+            }
         }
 
 
