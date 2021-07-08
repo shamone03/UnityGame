@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour {
     private float maxHealth = 100;
     private int grenades = 1;
     [SerializeField] int score;
-    private float runspeed = 20;
+    private float runspeed = 15;
     private float walkspeed = 10;
     private float boostspeed = 15f;
     private float airspeed = 7.5f;
@@ -172,28 +172,21 @@ public class PlayerController : MonoBehaviour {
         
         
         if (isGrounded) {
-            //if (Input.GetKey(KeyCode.LeftShift)) { 
-            //    speed = runspeed;
-            //} else {
-            //    speed = walkspeed;
-            //}
+            
             _ = Input.GetKey(KeyCode.LeftShift) ? speed = runspeed : speed = walkspeed;
             jumps = 2;
             jumpHeight = 3;
         } 
 
         if (!isGrounded) {
-            if (jumps == 1) {
-                
-                
-                speed = airspeed;
-                jumpHeight = 4;
-            } 
-                
-            
-            if (jumps == 0) {
-                speed = boostspeed;
-                
+            switch (jumps) {
+                case 1:
+                    speed = airspeed;
+                    jumpHeight = 4;
+                    break;
+                case 0:
+                    speed = boostspeed;
+                    break;
             }
         }
 
@@ -210,10 +203,11 @@ public class PlayerController : MonoBehaviour {
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
         if (!gunArray[selectedGun].overheated) {
+            UIController.instance.overheatedMessage.gameObject.SetActive(false);
             if (Input.GetMouseButtonDown(0)) {
                 Shoot();
 
-            }
+            }   
             if (Input.GetMouseButton(0) && gunArray[selectedGun].isAutomatic) {
                 shotCounter -= Time.deltaTime;
 
@@ -226,9 +220,10 @@ public class PlayerController : MonoBehaviour {
         } else {
             gunArray[selectedGun].heatCounter -= Time.deltaTime * overheatCoolRate;
             if (gunArray[selectedGun].heatCounter <= 0) {
-
                 gunArray[selectedGun].overheated = false;
                 UIController.instance.overheatedMessage.gameObject.SetActive(false);
+            } else {
+                UIController.instance.overheatedMessage.gameObject.SetActive(true);
             }
         }
         if (gunArray[selectedGun].heatCounter <= 0) {
