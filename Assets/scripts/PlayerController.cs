@@ -51,6 +51,10 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    public void ScoreIncrease(int score) {
+        this.score += score;
+    }
+
     void PlayerDead() {
         if (isPlayerDead) {
             UIController.instance.deadMessage.gameObject.SetActive(true);

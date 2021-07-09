@@ -90,7 +90,7 @@ public class NavMeshAgentBrain : MonoBehaviour {
         health -= damage;
         if (health <= 0) {
             float randomNumber = Random.Range(0f, 1f);
-            if (randomNumber <= 0.425f) {
+            if (randomNumber <= 0.25f) {
                 Instantiate(grenadeDrop, this.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
             } else {
                 Instantiate(healthDrop, this.transform.position + new Vector3(0, 1, 0), Quaternion.identity);

@@ -88,7 +88,7 @@ MonoBehaviour:
   health: 15
   playerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   timeBetweenHits: 1
   healthDrop: {fileID: 5435146314698054945, guid: 536575d26d4d68f44b53cc703d88eb08, type: 3}
   grenadeDrop: {fileID: 2580920968305014575, guid: dfff67dfeb572eb4bac2b6d9cf2c7ea7, type: 3}
