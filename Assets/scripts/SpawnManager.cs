@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
-
-public class SpawnManager : MonoBehaviour {
+using Photon.Pun;
+public class SpawnManager : MonoBehaviourPunCallbacks {
 
     [SerializeField]
     private GameObject enemyPrefab;
@@ -38,7 +39,7 @@ public class SpawnManager : MonoBehaviour {
             randomX = Random.Range(xMin, xMax);
             randomZ = Random.Range(zMin, zMax);
             sampleY = terrain.SampleHeight(new Vector3(randomX, 0, randomZ));
-            GameObject enemy = Instantiate(enemyPrefab, new Vector3(randomX, sampleY, randomZ), Quaternion.identity);
+            GameObject enemy = PhotonNetwork.Instantiate(enemyPrefab.name, new Vector3(randomX, sampleY, randomZ), Quaternion.identity);
             
             // if (!enemy.GetComponent<NavMeshAgent>().isOnNavMesh) {
             //     Physics.Raycast(enemy.transform.position, Vector3.down, out RaycastHit hit);

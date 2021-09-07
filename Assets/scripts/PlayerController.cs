@@ -1,7 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
-public class PlayerController : MonoBehaviour {
+using Photon.Pun;
+public class PlayerController : MonoBehaviourPunCallbacks {
     [SerializeField]
     private float speed;
     private float maxHealth = 100;
@@ -42,6 +43,11 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] LayerMask groundMask;
     [SerializeField] GameObject grenade;
     bool isPlayerDead;
+
+    private PhotonView view;
+
+    
+    
     public void Damage(int damage) {
         health -= damage;
         
@@ -51,6 +57,10 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    void MyInput() {
+        
+    }
+    
     public void ScoreIncrease(int score) {
         this.score += score;
     }
@@ -60,10 +70,10 @@ public class PlayerController : MonoBehaviour {
             UIController.instance.deadMessage.gameObject.SetActive(true);
             UIController.instance.crosshair.gameObject.SetActive(false);
             Cursor.lockState = CursorLockMode.Confined;
-            Time.timeScale = 0;
-            if (Input.GetKeyDown(KeyCode.Escape)) {
-                SceneManager.LoadScene("Menu");
-            }
+            // Time.timeScale = 0;
+            // if (Input.GetKeyDown(KeyCode.Escape)) {
+            //     SceneManager.LoadScene("Menu");
+            // }
         }
         
     }
@@ -75,8 +85,19 @@ public class PlayerController : MonoBehaviour {
     void DisplayHealth() {
         UIController.instance.healthSlider.value = health;
     }
+
+    private void Awake() {
+        // cam = transform.Find("Camera").GetComponent<Camera>();
+    }
+
     // Start is called before the first frame update
     private void Start() {
+        view = GetComponent<PhotonView>();
+        if (!photonView.IsMine) {
+            cam.enabled = false;
+            return;
+        }
+        
         Cursor.lockState = CursorLockMode.Locked;
         //cam = Camera.main;
         UIController.instance.weaponTempSlider.maxValue = maxHeat;
@@ -111,6 +132,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void OnTriggerEnter(Collider other) {
+        if (!photonView.IsMine) return;
         if (other.transform.CompareTag("Health")) {
             health += 10;
             score += 5;
@@ -145,6 +167,9 @@ public class PlayerController : MonoBehaviour {
         UIController.instance.grenades.text = "Grenades: " + grenades;
     }
     void Update() {
+        if (!photonView.IsMine) {
+            return;
+        }
         DisplayGrenades();
         DisplayScore();
         PlayerDead();
@@ -163,7 +188,7 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.F) && grenades >= 1) {
             grenades--;
             //Instantiate(grenade, this.transform.position + new Vector3(0, 1.04f, -0.08f), Quaternion.identity);
-            GameObject g = Instantiate(grenade, cam.transform.position + transform.forward, Quaternion.identity);
+            GameObject g = PhotonNetwork.Instantiate(grenade.name, cam.transform.position + transform.forward, Quaternion.identity);
             ThrowGrenade(g);
 
 
@@ -264,7 +289,10 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void LateUpdate() {
-        cam.transform.position = viewPoint.transform.position;
-        cam.transform.rotation = viewPoint.transform.rotation;
+        if (photonView.IsMine) {
+            
+            cam.transform.position = viewPoint.transform.position;
+            cam.transform.rotation = viewPoint.transform.rotation;
+        }
     }
 }

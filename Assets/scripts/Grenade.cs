@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class Grenade : MonoBehaviour {
+public class Grenade : MonoBehaviourPunCallbacks {
     float lifeTime;
     LayerMask enemyMask;
     [SerializeField] ParticleSystem explosion;
@@ -37,7 +38,7 @@ public class Grenade : MonoBehaviour {
                     enemy.transform.GetComponent<NavMeshAgentBrain>().Damage(100);
                 }
                 player.gameObject.transform.GetComponent<PlayerController>().ScoreIncrease(scoreIncrease);
-                Destroy(this.gameObject);
+                PhotonNetwork.Destroy(this.gameObject);
             }
             
         }

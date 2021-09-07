@@ -1,23 +1,25 @@
 using System;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
+using Photon.Pun;
 
-
-public class NavMeshAgentBrain : MonoBehaviour {
+public class NavMeshAgentBrain : MonoBehaviourPunCallbacks {
     
     public bool shouldMove = true;
     public GameObject player;
     public float health = 15;
     public LayerMask playerMask;
     [SerializeField]
-    float timeBetweenHits = 1f;
+    float timeBetweenHits = 1.5f;
     float counter;
     public GameObject healthDrop;
     public GameObject grenadeDrop;
     public Animator animator;
     NavMeshAgent navMeshAgent;
-
+    private int maxTargets = 2;
+    private Collider[] results = new Collider[2];
     
 
     // Start is called before the first frame update
@@ -56,17 +58,19 @@ public class NavMeshAgentBrain : MonoBehaviour {
         //    animator.Play("Z_Run_InPlace");
         //}
 
-        counter += Time.deltaTime;
+        
 
         if (navMeshAgent.isOnNavMesh) {
             
-            if (Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 30, playerMask) && !Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 3, playerMask)) {
+            // int numFound = Physics.OverlapSphereNonAlloc(this.transform.position + new Vector3(0, 2, 0), 50, results, playerMask);
+            if (Physics.OverlapSphere(this.transform.position + new Vector3(0, 2, 0), 50, playerMask).Length > 0  && !Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 3, playerMask)) {
                 
                 shouldMove = true;
                 animator.Play("Z_Run_InPlace");
-            } else if (Physics.CheckSphere(this.transform.position + new Vector3(0, 2, 0), 3, playerMask)) {
+            } else if (Physics.OverlapSphere(this.transform.position + new Vector3(0, 2, 0), 2, playerMask).Length > 0) {
                 shouldMove = false;
                 animator.Play("Z_Attack");
+                counter += Time.deltaTime;
                 if (counter >= timeBetweenHits) {
                     player.transform.GetComponent<PlayerController>().Damage(3);
                     counter = 0;
@@ -91,12 +95,12 @@ public class NavMeshAgentBrain : MonoBehaviour {
         if (health <= 0) {
             float randomNumber = Random.Range(0f, 1f);
             if (randomNumber <= 0.25f) {
-                Instantiate(grenadeDrop, this.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+                PhotonNetwork.Instantiate(grenadeDrop.name, this.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
             } else {
-                Instantiate(healthDrop, this.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+                PhotonNetwork.Instantiate(healthDrop.name, this.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
             }
 
-            Destroy(this.gameObject);
+            PhotonNetwork.Destroy(this.gameObject);
         }
     }
 }
